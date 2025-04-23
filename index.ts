@@ -1,5 +1,9 @@
 import { WLEDDdp, WLEDDdpOptions } from "./wled-ddp";
 import { ColorMath } from "./color-math";
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 /**
  * Configuration for the LED application
@@ -16,13 +20,33 @@ interface AppConfig {
 }
 
 /**
- * Default configuration for the application
+ * Helper to parse environment variables with type safety
+ * @param name - Environment variable name
+ * @param defaultValue - Default value if environment variable is not set
+ * @returns Parsed environment variable value
+ */
+function getEnvValue<T>(name: string, defaultValue: T): T {
+  const value = process.env[name];
+  if (value === undefined) {
+    return defaultValue;
+  }
+  
+  // Type conversion based on default value type
+  if (typeof defaultValue === 'number') {
+    return Number(value) as unknown as T;
+  }
+  
+  return value as unknown as T;
+}
+
+/**
+ * Default configuration loaded from environment variables
  */
 const config: AppConfig = {
-  host: 'wled.local',
-  port: 4048,
-  ledCount: 250,
-  updateInterval: 15
+  host: getEnvValue('WLED_HOST', 'wled.local'),
+  port: getEnvValue('WLED_PORT', 4048),
+  ledCount: getEnvValue('LED_COUNT', 250),
+  updateInterval: getEnvValue('UPDATE_INTERVAL', 15)
 };
 
 /**
@@ -48,6 +72,13 @@ class LedAnimationApp {
       ledCount: config.ledCount
     };
     
+    console.log('Initializing with config:', {
+      host: config.host,
+      port: config.port,
+      ledCount: config.ledCount,
+      updateInterval: config.updateInterval
+    });
+    
     this.socket = new WLEDDdp(options);
   }
   
@@ -64,7 +95,7 @@ class LedAnimationApp {
     // Send the LED data to the WLED device
     this.socket.send(rainbowLeds);
     
-    // Update the offset for the next frame, loops at 360 for the hue
+    // Update the offset for the next frame
     this.offset = (this.offset + 2) % 360;
   }
   

@@ -17,12 +17,25 @@ This project is a TypeScript implementation of the DDP protocol for controlling 
 npm install
 ```
 
-2. Configure your WLED device address in `index.ts` (defaults to 'wled.local')
+2. Configure your environment:
+   - Copy `.env.example` to `.env`
+   - Edit the values in `.env` to match your setup
 
 3. Run the project:
 ```
 npm start
 ```
+
+## Configuration
+
+The application can be configured using environment variables:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| WLED_HOST | Hostname or IP of your WLED device | wled.local |
+| WLED_PORT | DDP port number | 4048 |
+| LED_COUNT | Number of LEDs in your strip | 250 |
+| UPDATE_INTERVAL | Animation update interval (ms) | 15 |
 
 ## Usage
 
