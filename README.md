@@ -33,10 +33,13 @@ npm start
 ├── src/                  # Source code
 │   ├── index.ts          # Main application entry point
 │   ├── wled-ddp.ts       # WLED DDP client implementation
-│   └── color-math.ts     # Color utility functions
+│   ├── color-math.ts     # Color utility functions
+│   └── types/            # Type definitions
 ├── dist/                 # Compiled JavaScript (generated)
 ├── .env.example          # Example environment configuration
 ├── .env                  # Your environment configuration (not in git)
+├── eslint.config.js      # ESLint configuration (flat config format)
+├── .prettierrc           # Prettier configuration
 ├── package.json          # Project dependencies and scripts
 └── tsconfig.json         # TypeScript configuration
 ```
@@ -47,6 +50,20 @@ npm start
 - Clean the build directory: `npm run clean`
 - Run in development mode: `npm run dev`
 - Start the application: `npm start`
+- Lint code: `npm run lint`
+- Fix linting issues: `npm run lint:fix`
+- Format code: `npm run format`
+- Check formatting: `npm run format:check`
+
+## Technical Details
+
+This project uses:
+
+- **ES Modules**: Both TypeScript and JavaScript use ES module syntax with `.js` file extensions in imports
+- **TypeScript**: Configured with strict type checking using `NodeNext` module resolution
+- **ESLint 9**: Using the modern flat config format with strict TypeScript rules
+- **Prettier**: Ensures consistent code formatting
+- **Environment Variables**: Configurable via `.env` file
 
 ## Configuration
 

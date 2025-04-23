@@ -1,5 +1,5 @@
-import { WLEDDdp, WLEDDdpOptions } from "./wled-ddp";
-import { ColorMath } from "./color-math";
+import { WLEDDdp, WLEDDdpOptions } from './wled-ddp.js';
+import { ColorMath } from './color-math.js';
 import dotenv from 'dotenv';
 
 // Load environment variables
@@ -30,12 +30,12 @@ function getEnvValue<T>(name: string, defaultValue: T): T {
   if (value === undefined) {
     return defaultValue;
   }
-  
+
   // Type conversion based on default value type
   if (typeof defaultValue === 'number') {
     return Number(value) as unknown as T;
   }
-  
+
   return value as unknown as T;
 }
 
@@ -46,7 +46,7 @@ const config: AppConfig = {
   host: getEnvValue('WLED_HOST', 'wled.local'),
   port: getEnvValue('WLED_PORT', 4048),
   ledCount: getEnvValue('LED_COUNT', 250),
-  updateInterval: getEnvValue('UPDATE_INTERVAL', 15)
+  updateInterval: getEnvValue('UPDATE_INTERVAL', 15),
 };
 
 /**
@@ -57,61 +57,57 @@ class LedAnimationApp {
   private offset: number = 0;
   private intervalId?: NodeJS.Timeout;
   private readonly config: AppConfig;
-  
+
   /**
    * Creates a new LED animation application
    * @param config - Application configuration
    */
   constructor(config: AppConfig) {
     this.config = config;
-    
+
     // Initialize WLED connection
     const options: WLEDDdpOptions = {
       host: config.host,
       port: config.port,
-      ledCount: config.ledCount
+      ledCount: config.ledCount,
     };
-    
+
+    // eslint-disable-next-line no-console
     console.log('Initializing with config:', {
       host: config.host,
       port: config.port,
       ledCount: config.ledCount,
-      updateInterval: config.updateInterval
+      updateInterval: config.updateInterval,
     });
-    
+
     this.socket = new WLEDDdp(options);
   }
-  
+
   /**
    * Animation update function called on each interval
    */
   private update(): void {
     // Generate rainbow pattern with current offset
-    const rainbowLeds = ColorMath.generateRainbow(
-      this.config.ledCount, 
-      this.offset
-    );
-    
+    const rainbowLeds = ColorMath.generateRainbow(this.config.ledCount, this.offset);
+
     // Send the LED data to the WLED device
     this.socket.send(rainbowLeds);
-    
+
     // Update the offset for the next frame, loops at 360 for the hue
     this.offset = (this.offset + 2) % 360;
   }
-  
+
   /**
    * Starts the animation loop
    */
   public start(): void {
     if (!this.intervalId) {
-      this.intervalId = setInterval(
-        () => this.update(), 
-        this.config.updateInterval
-      );
+      this.intervalId = setInterval(() => this.update(), this.config.updateInterval);
+      // eslint-disable-next-line no-console
       console.log('Animation started');
     }
   }
-  
+
   /**
    * Stops the animation loop
    */
@@ -119,6 +115,7 @@ class LedAnimationApp {
     if (this.intervalId) {
       clearInterval(this.intervalId);
       this.intervalId = undefined;
+      // eslint-disable-next-line no-console
       console.log('Animation stopped');
     }
   }
@@ -130,6 +127,7 @@ app.start();
 
 // Handle graceful shutdown
 process.on('SIGINT', () => {
+  // eslint-disable-next-line no-console
   console.log('Shutting down...');
   app.stop();
   process.exit(0);

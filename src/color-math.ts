@@ -1,4 +1,4 @@
-import { Led } from "./wled-ddp";
+import { Led } from './wled-ddp.js';
 
 /**
  * Utility class for color-related mathematical calculations
@@ -20,7 +20,9 @@ export class ColorMath {
     const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
     const m = v - c;
 
-    let r = 0, g = 0, b = 0;
+    let r = 0,
+      g = 0,
+      b = 0;
 
     if (h >= 0 && h < 60) {
       [r, g, b] = [c, x, 0];
@@ -37,11 +39,7 @@ export class ColorMath {
     }
 
     // Convert to 0-255 range and return as LED tuple
-    return [
-      Math.round((r + m) * 255),
-      Math.round((g + m) * 255),
-      Math.round((b + m) * 255)
-    ];
+    return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)];
   }
 
   /**
@@ -52,7 +50,12 @@ export class ColorMath {
    * @param value - Color brightness (0-1), default 1
    * @returns Array of LED objects with RGB values
    */
-  public static generateRainbow(count: number, shift: number = 0, saturation: number = 1, value: number = 1): readonly Led[] {
+  public static generateRainbow(
+    count: number,
+    shift: number = 0,
+    saturation: number = 1,
+    value: number = 1
+  ): readonly Led[] {
     const rainbow: Led[] = [];
 
     // Calculate the hue step to distribute colors evenly across the spectrum
@@ -69,4 +72,4 @@ export class ColorMath {
 
     return rainbow;
   }
-} 
+}

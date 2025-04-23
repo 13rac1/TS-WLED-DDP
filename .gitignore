@@ -3,10 +3,9 @@ node_modules/
 
 # Build output
 dist/
-build/
-*.js
-*.js.map
-*.d.ts
+dist/*.js
+dist/*.js.map
+dist/*.d.ts
 
 # Environment variables
 .env
@@ -21,6 +20,10 @@ yarn-error.log*
 .idea/
 *.swp
 *.swo
+
+# Linting and formatting caches
+.eslintcache
+.prettier-cache
 
 # OS files
 .DS_Store
