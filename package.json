@@ -6,14 +6,14 @@
     "typescript": "^5.8.3",
     "wled-client": "^0.22.1"
   },
-  "name": "js-test",
+  "name": "ts-wled-ddp",
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "run": "tsc; node index.js"
+    "start": "tsc; node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
-  "description": ""
+  "author": "bderickson@gmail.com",
+  "license": "MIT",
+  "description": "A TypeScript implementation of the WLED DDP protocol"
 }

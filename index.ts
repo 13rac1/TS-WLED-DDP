@@ -1,83 +1,105 @@
-import { Led, WLEDDdp } from "./wled-ddp";
-
-const targetHost = 'wled.local';
-const targetPort = 4048;
-const socket = new WLEDDdp(targetHost, targetPort);
+import { WLEDDdp, WLEDDdpOptions } from "./wled-ddp";
+import { ColorMath } from "./color-math";
 
 /**
- * Converts HSV color values to RGB
- * @param h - Hue value (0-360)
- * @param s - Saturation value (0-1)
- * @param v - Value/Brightness (0-1)
- * @returns RGB values as a tuple [r, g, b] with values from 0-255
+ * Configuration for the LED application
  */
-function hsvToRgb(h: number, s: number, v: number): Led {
-  // Ensure h is within 0-360 range
-  h = h % 360;
-
-  // Calculate chroma, secondary component, and match value
-  const c = v * s;
-  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
-  const m = v - c;
-
-  let r = 0, g = 0, b = 0;
-
-  if (h >= 0 && h < 60) {
-    [r, g, b] = [c, x, 0];
-  } else if (h >= 60 && h < 120) {
-    [r, g, b] = [x, c, 0];
-  } else if (h >= 120 && h < 180) {
-    [r, g, b] = [0, c, x];
-  } else if (h >= 180 && h < 240) {
-    [r, g, b] = [0, x, c];
-  } else if (h >= 240 && h < 300) {
-    [r, g, b] = [x, 0, c];
-  } else {
-    [r, g, b] = [c, 0, x];
-  }
-
-  // Convert to 0-255 range and return as LED tuple
-  return [
-    Math.round((r + m) * 255),
-    Math.round((g + m) * 255),
-    Math.round((b + m) * 255)
-  ];
+interface AppConfig {
+  /** The hostname or IP address of the WLED device */
+  readonly host: string;
+  /** The port number for DDP communication */
+  readonly port: number;
+  /** Number of LEDs in the strip */
+  readonly ledCount: number;
+  /** Animation update interval in milliseconds */
+  readonly updateInterval: number;
 }
 
 /**
- * Generates an array of LEDs with rainbow colors
- * @param count - Number of LEDs to generate
- * @param offset - Value to offset the Hue by, default 0
- * @param saturation - Color saturation (0-1), default 1
- * @param value - Color brightness (0-1), default 1
- * @returns Array of LED objects with RGB values
+ * Default configuration for the application
  */
-function generateRainbow(count: number, shift: number = 0, saturation: number = 1, value: number = 1): Led[] {
-  const rainbow: Led[] = [];
+const config: AppConfig = {
+  host: 'wled.local',
+  port: 4048,
+  ledCount: 250,
+  updateInterval: 15
+};
 
-  // Calculate the hue step to distribute colors evenly across the spectrum
-  const hueStep = 360 / count;
-
-  // Generate each LED color
-  for (let i = 0; i < count; i++) {
-    // Calculate the hue for this position (0-360)
-    const hue = (i * hueStep + shift) % 360;
-
-    // Convert HSV to RGB and add to the rainbow array
-    rainbow.push(hsvToRgb(hue, saturation, value));
+/**
+ * Main application class for controlling LED animations
+ */
+class LedAnimationApp {
+  private readonly socket: WLEDDdp;
+  private offset: number = 0;
+  private intervalId?: NodeJS.Timeout;
+  private readonly config: AppConfig;
+  
+  /**
+   * Creates a new LED animation application
+   * @param config - Application configuration
+   */
+  constructor(config: AppConfig) {
+    this.config = config;
+    
+    // Initialize WLED connection
+    const options: WLEDDdpOptions = {
+      host: config.host,
+      port: config.port,
+      ledCount: config.ledCount
+    };
+    
+    this.socket = new WLEDDdp(options);
   }
-
-  return rainbow;
+  
+  /**
+   * Animation update function called on each interval
+   */
+  private update(): void {
+    // Generate rainbow pattern with current offset
+    const rainbowLeds = ColorMath.generateRainbow(
+      this.config.ledCount, 
+      this.offset
+    );
+    
+    // Send the LED data to the WLED device
+    this.socket.send(rainbowLeds);
+    
+    // Update the offset for the next frame, loops at 360 for the hue
+    this.offset = (this.offset + 2) % 360;
+  }
+  
+  /**
+   * Starts the animation loop
+   */
+  public start(): void {
+    if (!this.intervalId) {
+      this.intervalId = setInterval(
+        () => this.update(), 
+        this.config.updateInterval
+      );
+      console.log('Animation started');
+    }
+  }
+  
+  /**
+   * Stops the animation loop
+   */
+  public stop(): void {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = undefined;
+      console.log('Animation stopped');
+    }
+  }
 }
 
-var offset:number = 0;
-function runTime() {
+// Create and start the application
+const app = new LedAnimationApp(config);
+app.start();
 
-  var rainbowLeds: Led[] = generateRainbow(250,offset);
-  socket.send(rainbowLeds);
-
-  offset = offset +4;
-  offset = offset % 360;
-}
-
-const intervalID = setInterval(runTime, 15);
+// Handle graceful shutdown
+process.on('SIGINT', () => {
+  console.log('Shutting down...');
+  app.stop();
+  process.exit(0);
+});
