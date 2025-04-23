@@ -95,7 +95,7 @@ class LedAnimationApp {
     // Send the LED data to the WLED device
     this.socket.send(rainbowLeds);
     
-    // Update the offset for the next frame
+    // Update the offset for the next frame, loops at 360 for the hue
     this.offset = (this.offset + 2) % 360;
   }
   

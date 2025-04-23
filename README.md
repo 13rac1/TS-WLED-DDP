@@ -26,6 +26,28 @@ npm install
 npm start
 ```
 
+## Project Structure
+
+```
+.
+├── src/                  # Source code
+│   ├── index.ts          # Main application entry point
+│   ├── wled-ddp.ts       # WLED DDP client implementation
+│   └── color-math.ts     # Color utility functions
+├── dist/                 # Compiled JavaScript (generated)
+├── .env.example          # Example environment configuration
+├── .env                  # Your environment configuration (not in git)
+├── package.json          # Project dependencies and scripts
+└── tsconfig.json         # TypeScript configuration
+```
+
+## Development
+
+- Build the project: `npm run build`
+- Clean the build directory: `npm run clean`
+- Run in development mode: `npm run dev`
+- Start the application: `npm start`
+
 ## Configuration
 
 The application can be configured using environment variables:

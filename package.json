@@ -10,12 +10,20 @@
   },
   "name": "ts-wled-ddp",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "start": "tsc; node index.js",
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "start": "npm run build && node dist/index.js",
+    "dev": "ts-node src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "bderickson@gmail.com",
   "license": "MIT",
-  "description": "A TypeScript implementation of the WLED DDP protocol"
+  "description": "A TypeScript implementation of the WLED DDP protocol",
+  "devDependencies": {
+    "rimraf": "^5.0.10",
+    "ts-node": "^10.9.2"
+  }
 }
